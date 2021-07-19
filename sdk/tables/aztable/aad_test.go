@@ -9,7 +9,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/internal/recording"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,18 +52,26 @@ func requireNilError(r *require.Assertions, err error) {
 }
 
 func Test_AADCreateTable(t *testing.T) {
-	r := require.New(t)
+	assert := assert.New(t)
+	require := require.New(t)
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	r.Nil(err)
+	require.Nil(err)
 
 	serviceUrl := createServiceUrl(false, t)
 	tableName := createRandomNameFromSeed("table", t.Name())
 
-	options := TableClientOptions{Scopes: []string{"https://storage.azure.com/.default"}}
+	context := recording.NewTestContext(func(msg string) { assert.FailNow(msg) }, func(msg string) { t.Log(msg) }, func() string { return t.Name() })
+	r, err := recording.NewRecording(context, recording.Playback)
+
+	options := TableClientOptions{
+		Scopes:     []string{"https://storage.azure.com/.default"},
+		HTTPClient: r,
+		Retry:      azcore.RetryOptions{MaxRetries: -1},
+	}
 	client, err := NewTableClient(tableName, serviceUrl, cred, &options)
-	r.Nil(err)
+	require.Nil(err)
 	defer deferredDelete(client)
 
 	_, err = client.Create(ctx)
-	requireNilError(r, err)
+	requireNilError(require, err)
 }
