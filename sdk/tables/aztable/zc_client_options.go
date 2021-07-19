@@ -14,6 +14,8 @@ type TableClientOptions struct {
 	Retry azcore.RetryOptions
 	// Telemetry configures the built-in telemetry policy behavior.
 	Telemetry azcore.TelemetryOptions
+	// Scopes are the credential scopes for authentication
+	Scopes []string
 }
 
 func (o *TableClientOptions) getConnectionOptions() *connectionOptions {
@@ -22,8 +24,10 @@ func (o *TableClientOptions) getConnectionOptions() *connectionOptions {
 	}
 
 	return &connectionOptions{
-		HTTPClient: o.HTTPClient,
-		Retry:      o.Retry,
-		Telemetry:  o.Telemetry,
+		HTTPClient:       o.HTTPClient,
+		Retry:            o.Retry,
+		Telemetry:        o.Telemetry,
+		PerCallPolicies:  make([]azcore.Policy, 0),
+		PerRetryPolicies: make([]azcore.Policy, 0),
 	}
 }
