@@ -18,71 +18,69 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/internal/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCastAndRemoveAnnotations(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	r := &http.Response{Body: closerFromString(complexPayload)}
 	resp := azcore.Response{Response: r}
 
 	var val map[string]interface{}
 	err := resp.UnmarshalAsJSON(&val)
-	assert.Nil(err)
+	require.NoError(err)
 	err = castAndRemoveAnnotations(&val)
-	assert.Nil(err)
+	require.NoError(err)
 	// assert all odata annotations are removed.
 	for k := range val {
-		assert.NotContains(k, OdataType)
+		require.NotContains(k, OdataType)
 	}
 
-	assert.IsType(time.Now(), val["SomeDateProperty"])
-	assert.IsType([]byte{}, val["SomeBinaryProperty"])
-	assert.IsType(float64(0), val["SomeDoubleProperty0"])
-	// TODO: fix this
-	// assert.IsType(int(0), (*entity)["SomeIntProperty"])
+	require.IsType(time.Now(), val["SomeDateProperty"])
+	require.IsType([]byte{}, val["SomeBinaryProperty"])
+	require.IsType(float64(0), val["SomeDoubleProperty0"])
 }
 
 func TestToOdataAnnotatedDictionary(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	var val = createComplexEntityMap()
 	err := toOdataAnnotatedDictionary(&val)
-	assert.Nil(err)
+	require.NoError(err)
 	// assert all odata annotations are removed.
 	for k := range odataHintProps {
 		_, ok := val[k]
-		assert.Truef(ok, fmt.Sprintf("map does not contain %s", k))
+		require.Truef(ok, fmt.Sprintf("map does not contain %s", k))
 		iSuffix := strings.Index(k, OdataType)
 		if iSuffix > 0 {
 			// Get the name of the property that this odataType key describes.
 			valueKey := k[0:iSuffix]
 			if !strings.Contains(valueKey, "SomeDoubleProperty") {
-				assert.IsTypef("", val[valueKey], fmt.Sprintf("should be type string %s", valueKey))
+				require.IsTypef("", val[valueKey], fmt.Sprintf("should be type string %s", valueKey))
 			}
 		}
 		_, ok = val[odataType(k)]
-		assert.Truef(ok, fmt.Sprintf("map does not contain %s", odataType(k)))
+		require.Truef(ok, fmt.Sprintf("map does not contain %s", odataType(k)))
 	}
 }
 
 func BenchmarkUnMarshal_AsJson_CastAndRemove_Map(b *testing.B) {
-	assert := assert.New(b)
+	require := require.New(b)
 	b.ReportAllocs()
 	bt := []byte(complexPayload)
 	for i := 0; i < b.N; i++ {
 		var val = make(map[string]interface{})
 		err := json.Unmarshal(bt, &val)
-		assert.Nil(err)
+		require.NoError(err)
 		err = castAndRemoveAnnotations(&val)
-		assert.Nil(err)
-		assert.Equal("somePartition", val["PartitionKey"])
+		require.NoError(err)
+		require.Equal("somePartition", val["PartitionKey"])
 	}
 }
 
 func BenchmarkUnMarshal_FromMap_Entity(b *testing.B) {
-	assert := assert.New(b)
+	require := require.New(b)
 
 	bt := []byte(complexPayload)
 	for i := 0; i < b.N; i++ {
@@ -93,8 +91,8 @@ func BenchmarkUnMarshal_FromMap_Entity(b *testing.B) {
 		}
 		result := complexEntity{}
 		err = EntityMapAsModel(val, &result)
-		assert.Nil(err)
-		assert.Equal("somePartition", result.PartitionKey)
+		require.NoError(err)
+		require.Equal("somePartition", result.PartitionKey)
 	}
 }
 
@@ -126,81 +124,81 @@ func BenchmarkMarshal_Map_ToOdataDict_Map(b *testing.B) {
 }
 
 func TestToMap(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	ent := createComplexEntity()
 
 	entMap, err := toMap(ent)
-	assert.Nil(err)
+	require.NoError(err)
 
 	// Validate that we have all the @odata.type properties for types []byte, int64, float64, time.Time, and uuid
 	for k, v := range odataHintProps {
 		vv, ok := (*entMap)[odataType(k)]
-		assert.Truef(ok, "Should have found map key of name '%s'", odataType(k))
-		assert.Equal(v, vv)
+		require.Truef(ok, "Should have found map key of name '%s'", odataType(k))
+		require.Equal(v, vv)
 	}
 
 	// validate all the types were properly casted / converted
-	assert.Equal(ent.PartitionKey, (*entMap)["PartitionKey"])
-	assert.Equal(ent.RowKey, (*entMap)["RowKey"])
-	assert.Equal(base64.StdEncoding.EncodeToString(ent.SomeBinaryProperty), string((*entMap)["SomeBinaryProperty"].(string)))
+	require.Equal(ent.PartitionKey, (*entMap)["PartitionKey"])
+	require.Equal(ent.RowKey, (*entMap)["RowKey"])
+	require.Equal(base64.StdEncoding.EncodeToString(ent.SomeBinaryProperty), string((*entMap)["SomeBinaryProperty"].(string)))
 	ts, _ := time.Parse(ISO8601, (*entMap)["SomeDateProperty"].(string))
-	assert.Equal(ent.SomeDateProperty.UTC().Format(ISO8601), ts.Format(ISO8601))
-	assert.Equal(ent.SomeDoubleProperty0, (*entMap)["SomeDoubleProperty0"])
-	assert.Equal(ent.SomeDoubleProperty1, (*entMap)["SomeDoubleProperty1"])
+	require.Equal(ent.SomeDateProperty.UTC().Format(ISO8601), ts.Format(ISO8601))
+	require.Equal(ent.SomeDoubleProperty0, (*entMap)["SomeDoubleProperty0"])
+	require.Equal(ent.SomeDoubleProperty1, (*entMap)["SomeDoubleProperty1"])
 	var u uuid.UUID = ent.SomeGuidProperty
-	assert.Equal(u.String(), (*entMap)["SomeGuidProperty"].(string))
-	assert.Equal(strconv.FormatInt(ent.SomeInt64Property, 10), (*entMap)["SomeInt64Property"].(string))
-	assert.Equal(ent.SomeIntProperty, (*entMap)["SomeIntProperty"])
-	assert.Equal(ent.SomeStringProperty, (*entMap)["SomeStringProperty"])
-	assert.Equal(*ent.SomePtrStringProperty, (*entMap)["SomePtrStringProperty"])
+	require.Equal(u.String(), (*entMap)["SomeGuidProperty"].(string))
+	require.Equal(strconv.FormatInt(ent.SomeInt64Property, 10), (*entMap)["SomeInt64Property"].(string))
+	require.Equal(ent.SomeIntProperty, (*entMap)["SomeIntProperty"])
+	require.Equal(ent.SomeStringProperty, (*entMap)["SomeStringProperty"])
+	require.Equal(*ent.SomePtrStringProperty, (*entMap)["SomePtrStringProperty"])
 }
 
 func TestToMapWithMap(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	ent := createComplexEntityMap()
 
 	entMap, err := toMap(ent)
-	assert.Nil(err)
+	require.NoError(err)
 
 	// Validate that we have all the @odata.type properties for types []byte, int64, float64, time.Time, and uuid
 	for k, v := range odataHintProps {
 		vv, ok := (*entMap)[odataType(k)]
-		assert.Truef(ok, "Should have found map key of name '%s'", odataType(k))
-		assert.Equal(v, vv)
+		require.Truef(ok, "Should have found map key of name '%s'", odataType(k))
+		require.Equal(v, vv)
 	}
 
-	assert.Equal(&ent, entMap)
+	require.Equal(&ent, entMap)
 }
 
 func TestEntitySerialization(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	ent := createComplexEntity()
 
 	b, err := json.Marshal(ent)
-	assert.Nil(err)
-	assert.NotEmpty(b)
+	require.NoError(err)
+	require.NotEmpty(b)
 	s := string(b)
-	//assert.FailNow(s)
-	assert.NotEmpty(s)
+	//require.FailNow(s)
+	require.NotEmpty(s)
 }
 
 func TestDeserializeFromMap(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 
 	expected := createComplexEntity()
 	bt := []byte(complexPayload)
 	var val = make(map[string]interface{})
 	err := json.Unmarshal(bt, &val)
-	assert.Nil(err)
+	require.NoError(err)
 	result := complexEntity{}
 	// tt := reflect.TypeOf(complexEntity{})
 	// err := fromMap(tt, getTypeValueMap(tt), &val, reflect.ValueOf(&result).Elem())
 	err = EntityMapAsModel(val, &result)
-	assert.Nil(err)
-	assert.EqualValues(expected, result)
+	require.NoError(err)
+	require.EqualValues(expected, result)
 }
 
 func createComplexEntity() complexEntity {

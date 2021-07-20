@@ -12,7 +12,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/internal/recording"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type testContext struct {
@@ -52,12 +52,6 @@ func cosmosURI(accountName string, endpointSuffix string) string {
 	return "https://" + accountName + ".table." + endpointSuffix
 }
 
-func failIfNotNil(a *assert.Assertions, e error) {
-	if e != nil {
-		a.FailNow(e.Error())
-	}
-}
-
 // create the test specific TableClient and wire it up to recordings
 func recordedTestSetup(t *testing.T, testName string, endpointType EndpointType, mode recording.RecordMode) {
 	var accountName string
@@ -65,36 +59,36 @@ func recordedTestSetup(t *testing.T, testName string, endpointType EndpointType,
 	var cred *SharedKeyCredential
 	var secret string
 	var uri string
-	assert := assert.New(t)
+	require := require.New(t)
 
 	// init the test framework
-	context := recording.NewTestContext(func(msg string) { assert.FailNow(msg) }, func(msg string) { t.Log(msg) }, func() string { return testName })
+	context := recording.NewTestContext(func(msg string) { require.FailNow(msg) }, func(msg string) { t.Log(msg) }, func() string { return testName })
 	r, err := recording.NewRecording(context, mode)
-	assert.Nil(err)
+	require.NoError(err)
 
 	if endpointType == StorageEndpoint {
 		accountName, err = r.GetRecordedVariable(storageAccountNameEnvVar, recording.Default)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		suffix = r.GetOptionalRecordedVariable(storageEndpointSuffixEnvVar, DefaultStorageSuffix, recording.Default)
 		secret, err = r.GetRecordedVariable(storageAccountKeyEnvVar, recording.Secret_Base64String)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		cred, err = NewSharedKeyCredential(accountName, secret)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		uri = storageURI(accountName, suffix)
 	} else {
 		accountName, err = r.GetRecordedVariable(cosmosAccountNameEnnVar, recording.Default)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		suffix = r.GetOptionalRecordedVariable(cosmosEndpointSuffixEnvVar, DefaultCosmosSuffix, recording.Default)
 		secret, err = r.GetRecordedVariable(cosmosAccountKeyEnvVar, recording.Secret_Base64String)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		cred, err = NewSharedKeyCredential(accountName, secret)
-		failIfNotNil(assert, err)
+		require.NoError(err)
 		uri = cosmosURI(accountName, suffix)
 		cosmosTestsMap[testName] = true
 	}
 
 	client, err := NewTableServiceClient(uri, cred, &TableClientOptions{HTTPClient: r, Retry: azcore.RetryOptions{MaxRetries: -1}})
-	assert.Nil(err)
+	require.NoError(err)
 	clientsMap[testName] = &testContext{client: client, recording: r, context: &context}
 }
 
