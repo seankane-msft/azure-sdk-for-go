@@ -84,11 +84,11 @@ func (t *TableClient) GetEntity(ctx context.Context, partitionKey string, rowKey
 
 // AddEntity adds an entity (described by a JSON byte slice) to the table. This method returns an error if an entity with
 // the same PartitionKey and RowKey already exists in the table.
-func (t *TableClient) AddEntity(ctx context.Context, entity []byte) (interface{}, error) {
+func (t *TableClient) AddEntity(ctx context.Context, entity []byte) (TableInsertEntityResponse, error) {
 	var mapEntity map[string]interface{}
 	err := json.Unmarshal(entity, &mapEntity)
 	if err != nil {
-		return entity, err
+		return TableInsertEntityResponse{}, err
 	}
 	resp, err := t.client.InsertEntity(ctx, t.Name, &TableInsertEntityOptions{TableEntityProperties: mapEntity, ResponsePreference: ResponseFormatReturnNoContent.ToPtr()}, nil)
 	if err == nil {
@@ -113,8 +113,8 @@ func (t *TableClient) DeleteEntity(ctx context.Context, partitionKey string, row
 // If updateMode is Replace, the entity will be replaced. This is the only way to remove properties from an existing entity.
 // If updateMode is Merge, the property values present in the specified entity will be merged with the existing entity. Properties not specified in the merge will be unaffected.
 // The specified etag value will be used for optimistic concurrency. If the etag does not match the value of the entity in the table, the operation will fail.
-// The response type will be TableEntityMergeResponse if updateMode is Merge and TableEntityUpdateResponse if updateMode is Replace.
-func (t *TableClient) UpdateEntity(ctx context.Context, entity []byte, etag *string, updateMode EntityUpdateMode) (interface{}, error) {
+// The response type will be TableMergeReplaceEntityResponse.
+func (t *TableClient) UpdateEntity(ctx context.Context, entity []byte, etag *string, updateMode EntityUpdateMode) (TableMergeReplaceEntityResponse, error) {
 	var ifMatch string = "*"
 	if etag != nil {
 		ifMatch = *etag
@@ -123,7 +123,7 @@ func (t *TableClient) UpdateEntity(ctx context.Context, entity []byte, etag *str
 	var mapEntity map[string]interface{}
 	err := json.Unmarshal(entity, &mapEntity)
 	if err != nil {
-		return entity, err
+		return TableMergeReplaceEntityResponse{}, err
 	}
 
 	pk, _ := mapEntity[partitionKey]
@@ -134,22 +134,24 @@ func (t *TableClient) UpdateEntity(ctx context.Context, entity []byte, etag *str
 
 	switch updateMode {
 	case MergeEntity:
-		return t.client.MergeEntity(ctx, t.Name, partKey, rowkey, &TableMergeEntityOptions{IfMatch: &ifMatch, TableEntityProperties: mapEntity}, &QueryOptions{})
+		resp, err := t.client.MergeEntity(ctx, t.Name, partKey, rowkey, &TableMergeEntityOptions{IfMatch: &ifMatch, TableEntityProperties: mapEntity}, &QueryOptions{})
+		return *castMergeEntityResponse(resp), err
 	case ReplaceEntity:
-		return t.client.UpdateEntity(ctx, t.Name, partKey, rowkey, &TableUpdateEntityOptions{IfMatch: &ifMatch, TableEntityProperties: mapEntity}, &QueryOptions{})
+		resp, err := t.client.UpdateEntity(ctx, t.Name, partKey, rowkey, &TableUpdateEntityOptions{IfMatch: &ifMatch, TableEntityProperties: mapEntity}, &QueryOptions{})
+		return *castUpdateEntityResponse(resp), err
 	}
-	return nil, errors.New("Invalid EntityUpdateMode")
+	return TableMergeReplaceEntityResponse{}, errors.New("invalid EntityUpdateMode")
 }
 
 // InsertEntity inserts an entity if it does not already exist in the table. If the entity does exist, the entity is
 // replaced or merged as specified the updateMode parameter. If the entity exists and updateMode is Merge, the property
 // values present in the specified entity will be merged with the existing entity rather than replaced.
-// The response type will be TableEntityMergeResponse if updateMode is Merge and TableEntityUpdateResponse if updateMode is Replace.
-func (t *TableClient) InsertEntity(ctx context.Context, entity []byte, updateMode EntityUpdateMode) (interface{}, error) {
+// The response type will be TableMergeReplaceEntityResponse.
+func (t *TableClient) InsertEntity(ctx context.Context, entity []byte, updateMode EntityUpdateMode) (TableMergeReplaceEntityResponse, error) {
 	var mapEntity map[string]interface{}
 	err := json.Unmarshal(entity, &mapEntity)
 	if err != nil {
-		return entity, err
+		return TableMergeReplaceEntityResponse{}, err
 	}
 
 	pk, _ := mapEntity[partitionKey]
@@ -160,11 +162,13 @@ func (t *TableClient) InsertEntity(ctx context.Context, entity []byte, updateMod
 
 	switch updateMode {
 	case MergeEntity:
-		return t.client.MergeEntity(ctx, t.Name, partKey, rowkey, &TableMergeEntityOptions{TableEntityProperties: mapEntity}, &QueryOptions{})
+		resp, err := t.client.MergeEntity(ctx, t.Name, partKey, rowkey, &TableMergeEntityOptions{TableEntityProperties: mapEntity}, &QueryOptions{})
+		return *castMergeEntityResponse(resp), err
 	case ReplaceEntity:
-		return t.client.UpdateEntity(ctx, t.Name, partKey, rowkey, &TableUpdateEntityOptions{TableEntityProperties: mapEntity}, &QueryOptions{})
+		resp, err := t.client.UpdateEntity(ctx, t.Name, partKey, rowkey, &TableUpdateEntityOptions{TableEntityProperties: mapEntity}, &QueryOptions{})
+		return *castUpdateEntityResponse(resp), err
 	}
-	return nil, errors.New("Invalid EntityUpdateMode")
+	return TableMergeReplaceEntityResponse{}, errors.New("Invalid EntityUpdateMode")
 }
 
 // GetAccessPolicy retrieves details about any stored access policies specified on the table that may be used with the Shared Access Signature
