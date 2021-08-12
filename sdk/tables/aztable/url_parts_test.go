@@ -35,4 +35,11 @@ func TestTableUrlParts(t *testing.T) {
 		SAS:    sas,
 	}
 	require.Equal(t, parts3.URL(), fmt.Sprintf("https://fakename2.table.core.windows.net/?%v", sas.Encode()))
+
+	parts4 := TableURLParts{
+		Scheme:              "https",
+		IPEndpointStyleInfo: IPEndpointStyleInfo{AccountName: "accountname"},
+		Host:                "127.0.0.1:10002",
+	}
+	require.Equal(t, parts4.URL(), "https://127.0.0.1:10002/accountname")
 }
