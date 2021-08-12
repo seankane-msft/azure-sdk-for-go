@@ -25,5 +25,5 @@ const (
 	ISO8601       = "2006-01-02T15:04:05.9999999Z"
 )
 
-var partitionKeyRowKeyError = errors.New("Entity must have a PartitionKey and RowKey")
-var tooManyAccessPoliciesError = errors.New("You cannot set more than five (5) access policies at a time.")
+var partitionKeyRowKeyError = errors.New("entity must have a PartitionKey and RowKey")
+var tooManyAccessPoliciesError = errors.New("cannot set more than five (5) access policies at a time.")

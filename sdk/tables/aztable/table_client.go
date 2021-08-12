@@ -19,6 +19,34 @@ type TableClient struct {
 	Name    string
 }
 
+// TableClientOptions allows a user to customize the client, policy options, and credential scopes for a TableClient object.
+type TableClientOptions struct {
+	// HTTPClient sets the transport for making HTTP requests.
+	HTTPClient azcore.Transport
+	// Retry configures the built-in retry policy behavior.
+	Retry azcore.RetryOptions
+	// Telemetry configures the built-in telemetry policy behavior.
+	Telemetry azcore.TelemetryOptions
+	// PerCallOptions are options to run on every request
+	PerCallOptions []azcore.Policy
+	// Scopes are the authentication scopes for AAD Authentication
+	Scopes []string
+}
+
+// getConnectionOptions returns the connectionOptions with the policies specified in TableClientOptions
+func (o *TableClientOptions) getConnectionOptions() *connectionOptions {
+	if o == nil {
+		return nil
+	}
+
+	return &connectionOptions{
+		HTTPClient: o.HTTPClient,
+		Retry:      o.Retry,
+		Telemetry:  o.Telemetry,
+	}
+}
+
+// EntityUpdateMode determines the update mode. Options are ReplaceEntity or MergeEntity.
 type EntityUpdateMode string
 
 const (
