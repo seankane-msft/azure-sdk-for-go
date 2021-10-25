@@ -18,11 +18,11 @@ import (
 type ServiceClient struct {
 	client  *generated.TableClient
 	service *generated.ServiceClient
-	cred    azcore.Credential
+	cred    azcore.TokenCredential
 }
 
 // NewServiceClient creates a ServiceClient struct using the specified serviceURL, credential, and options.
-func NewServiceClient(serviceURL string, cred azcore.Credential, options *ClientOptions) (*ServiceClient, error) {
+func NewServiceClient(serviceURL string, cred azcore.TokenCredential, options *ClientOptions) (*ServiceClient, error) {
 	if options == nil {
 		options = &ClientOptions{}
 	}

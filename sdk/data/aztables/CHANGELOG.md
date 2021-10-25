@@ -1,8 +1,9 @@
 # Release History
 
-## 0.2.1 (Unreleased)
+## 0.3.0 (Unreleased)
 
 ### Features Added
+* Updated to `azcore@v0.20.0`
 
 ### Breaking Changes
 

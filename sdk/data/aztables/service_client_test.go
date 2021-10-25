@@ -166,10 +166,10 @@ func TestGetStatistics(t *testing.T) {
 	var cred azcore.Credential
 	var err error
 
-	err = recording.StartRecording(t, pathToPackage, nil)
+	err = recording.Start(t, pathToPackage, nil)
 	require.NoError(t, err)
 	stop := func() {
-		err = recording.StopRecording(t, nil)
+		err = recording.Stop(t, nil)
 		require.NoError(t, err)
 	}
 	defer stop()

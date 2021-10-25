@@ -41,9 +41,9 @@ func convertConnStrToMap(connStr string) (map[string]string, error) {
 
 // parseConnectionString parses a connection string into a service URL and a SharedKeyCredential or a service url with the
 // SharedAccessSignature combined.
-func parseConnectionString(connStr string) (string, azcore.Credential, error) {
+func parseConnectionString(connStr string) (string, azcore.TokenCredential, error) {
 	var serviceURL string
-	var cred azcore.Credential
+	var cred azcore.TokenCredential
 
 	defaultScheme := "https"
 	defaultSuffix := "core.windows.net"

@@ -21,14 +21,14 @@ import (
 type Client struct {
 	client  *generated.TableClient
 	service *ServiceClient
-	cred    azcore.Credential
+	cred    azcore.TokenCredential
 	name    string
 }
 
 // NewClient creates a Client struct in the context of the table specified in the serviceURL, credential, and options.
 // The serviceURL param is expected to have the name of the table in a format similar to: "https://myAccountName.core.windows.net/<myTableName>".
 // If the serviceURL contains a Shared Access Signature, use azcore.NewAnonymousCredential() as the credential.
-func NewClient(serviceURL string, cred azcore.Credential, options *ClientOptions) (*Client, error) {
+func NewClient(serviceURL string, cred azcore.TokenCredential, options *ClientOptions) (*Client, error) {
 	if options == nil {
 		options = &ClientOptions{}
 	}
