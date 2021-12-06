@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 var pathToPackage = "sdk/storage/azblob/testdata"
 
 func createServiceClientWithSharedKeyForRecording(t *testing.T, accountType testAccountType) (ServiceClient, error) {
-	cred, err := getRecordingCredential(t)
+	cred, err := getRecordingCredential(t, accountType)
 	require.NoError(t, err)
 
 	transporter, err := recording.NewRecordingHTTPClient(t, nil)
@@ -55,9 +55,10 @@ func createServiceClientWithSharedKeyForRecording(t *testing.T, accountType test
 	options := &ClientOptions{
 		Transporter: transporter,
 	}
-	serviceURL := fmt.Sprintf("https://%s%s.blob.core.windows.net/", accountType, cred.AccountName())
+	serviceURL := fmt.Sprintf("https://%s.blob.core.windows.net/", cred.AccountName())
 	return NewServiceClientWithSharedKey(serviceURL, cred, options)
 }
+
 func createServiceClientWithConnStrForRecording(t *testing.T, accountType testAccountType) (ServiceClient, error) {
 	transporter, err := recording.NewRecordingHTTPClient(t, nil)
 	require.NoError(t, err)
@@ -66,25 +67,44 @@ func createServiceClientWithConnStrForRecording(t *testing.T, accountType testAc
 		Transporter: transporter,
 	}
 
-	accountName, ok := os.LookupEnv(AccountNameEnvVar)
-	require.True(t, ok)
-	accountKey, ok := os.LookupEnv(AccountKeyEnvVar)
-	require.True(t, ok)
+	accountName, accountKey := getAccountNameKey(t, accountType)
 
 	connectionString := fmt.Sprintf("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net/", accountName, accountKey)
 
 	return NewServiceClientFromConnectionString(connectionString, options)
 }
 
-func getRecordingCredential(t *testing.T) (*SharedKeyCredential, error) {
+func getRecordingCredential(t *testing.T, accountType testAccountType) (*SharedKeyCredential, error) {
 	if recording.GetRecordMode() == recording.PlaybackMode {
-		return NewSharedKeyCredential("accountName", "accountKeyKey")
+		return NewSharedKeyCredential("fakeAccountName", "accountKeyKey")
 	}
-	accountName, ok := os.LookupEnv(AccountNameEnvVar)
-	require.True(t, ok)
-	accountKey, ok := os.LookupEnv(AccountKeyEnvVar)
-	require.True(t, ok)
+	accountName, accountKey := getAccountNameKey(t, accountType)
 	return NewSharedKeyCredential(accountName, accountKey)
+}
+
+func getAccountNameKey(t *testing.T, accountType testAccountType) (string, string) {
+	var accountName string
+	var accountKey string
+	var ok bool
+
+	if accountType == testAccountDefault {
+		accountName, ok = os.LookupEnv("STORAGE_ACCOUNT_NAME")
+		require.True(t, ok)
+		accountKey, ok = os.LookupEnv("STORAGE_ACCOUNT_KEY")
+		require.True(t, ok)
+	} else if accountType == testAccountSecondary {
+		accountName, ok = os.LookupEnv("SECONDARY_STORAGE_ACCOUNT_NAME")
+		require.True(t, ok)
+		accountKey, ok = os.LookupEnv("SECONDARY_STORAGE_ACCOUNT_KEY")
+		require.True(t, ok)
+	} else if accountType == testAccountPremium {
+		accountName, ok = os.LookupEnv("PREMIUM_STORAGE_ACCOUNT_NAME")
+		require.True(t, ok)
+		accountKey, ok = os.LookupEnv("PREMIUM_STORAGE_ACCOUNT_KEY")
+		require.True(t, ok)
+	}
+
+	return accountName, accountKey
 }
 
 func start(t *testing.T) func() {
