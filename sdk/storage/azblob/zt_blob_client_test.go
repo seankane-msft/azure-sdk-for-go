@@ -417,9 +417,7 @@ func TestBlobStartCopyUsingSASSrc(t *testing.T) {
 	sasURL.SAS = queryParams
 
 	// Create a new container for the destination
-
 	serviceClient2, err := createServiceClientWithSharedKeyForRecording(t, testAccountSecondary)
-	// serviceClient2, err := getServiceClient(nil, testAccountSecondary, nil)
 	if err != nil {
 		t.Skip(err.Error())
 	}
@@ -692,24 +690,23 @@ func TestBlobStartCopySourceIfNoneMatchTrue(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func (s *azblobTestSuite) TestBlobStartCopySourceIfNoneMatchFalse() {
-	_assert := assert.New(s.T())
-	// testName := s.T().Name()
-	_context := getTestContext(s.T().Name())
-	svcClient, err := getServiceClient(_context.recording, testAccountDefault, nil)
-	if err != nil {
-		s.Fail("Unable to fetch service client because " + err.Error())
-	}
+func TestBlobStartCopySourceIfNoneMatchFalse(t *testing.T) {
+	t.Skip("Error: 'System.InvalidCastException: Unable to cast object of type 'System.Net.Http.EmptyReadStream' to type 'System.IO.MemoryStream'.'")
+	stop := start(t)
+	defer stop()
 
-	containerName := generateContainerName(s.T().Name())
-	containerClient := createNewContainer(_assert, containerName, svcClient)
-	defer deleteContainer(_assert, containerClient)
+	svcClient, err := createServiceClientWithSharedKeyForRecording(t, testAccountDefault)
+	require.NoError(t, err)
 
-	blockBlobName := generateBlobName(s.T().Name())
-	bbClient := createNewBlockBlob(_assert, blockBlobName, containerClient)
+	containerName := generateContainerName(t.Name())
+	containerClient := createNewContainer(assert.New(t), containerName, svcClient)
+	defer deleteContainer(assert.New(t), containerClient)
+
+	blockBlobName := generateBlobName(t.Name())
+	bbClient := createNewBlockBlob(assert.New(t), blockBlobName, containerClient)
 
 	resp, err := bbClient.GetProperties(ctx, nil)
-	_assert.Nil(err)
+	require.NoError(t, err)
 
 	options := StartCopyBlobOptions{
 		SourceModifiedAccessConditions: &SourceModifiedAccessConditions{
@@ -717,32 +714,31 @@ func (s *azblobTestSuite) TestBlobStartCopySourceIfNoneMatchFalse() {
 		},
 	}
 
-	destBlobName := "dest" + generateBlobName(s.T().Name())
+	destBlobName := "dest" + generateBlobName(t.Name())
 	destBlobClient := getBlockBlobClient(destBlobName, containerClient)
 	_, err = destBlobClient.StartCopyFromURL(ctx, bbClient.URL(), &options)
-	_assert.NotNil(err)
-	validateStorageError(_assert, err, StorageErrorCodeSourceConditionNotMet)
+	require.NoError(t, err)
+	validateStorageError(assert.New(t), err, StorageErrorCodeSourceConditionNotMet)
 }
 
-func (s *azblobTestSuite) TestBlobStartCopyDestIfModifiedSinceTrue() {
-	_assert := assert.New(s.T())
-	// testName := s.T().Name()
-	_context := getTestContext(s.T().Name())
-	svcClient, err := getServiceClient(_context.recording, testAccountDefault, nil)
-	if err != nil {
-		s.Fail("Unable to fetch service client because " + err.Error())
-	}
+func TestBlobStartCopyDestIfModifiedSinceTrue(t *testing.T) {
+	t.Skip("Error: 'System.InvalidCastException: Unable to cast object of type 'System.Net.Http.EmptyReadStream' to type 'System.IO.MemoryStream'.'")
+	stop := start(t)
+	defer stop()
 
-	containerName := generateContainerName(s.T().Name())
-	containerClient := createNewContainer(_assert, containerName, svcClient)
-	defer deleteContainer(_assert, containerClient)
+	svcClient, err := createServiceClientWithSharedKeyForRecording(t, testAccountDefault)
+	require.NoError(t, err)
 
-	bbName := generateBlobName(s.T().Name())
+	containerName := generateContainerName(t.Name())
+	containerClient := createNewContainer(assert.New(t), containerName, svcClient)
+	defer deleteContainer(assert.New(t), containerClient)
+
+	bbName := generateBlobName(t.Name())
 	bbClient := getBlockBlobClient(bbName, containerClient)
 
 	cResp, err := bbClient.Upload(ctx, internal.NopCloser(strings.NewReader(blockBlobDefaultData)), nil)
-	_assert.Nil(err)
-	_assert.Equal(cResp.RawResponse.StatusCode, 201)
+	require.Nil(t, err)
+	require.Equal(t, cResp.RawResponse.StatusCode, 201)
 
 	currentTime := getRelativeTimeFromAnchor(cResp.Date, -10)
 
@@ -751,12 +747,12 @@ func (s *azblobTestSuite) TestBlobStartCopyDestIfModifiedSinceTrue() {
 			IfModifiedSince: &currentTime,
 		},
 	}
-	destBlobClient := createNewBlockBlob(_assert, "dst"+bbName, containerClient) // The blob must exist to have a last-modified time
+	destBlobClient := createNewBlockBlob(assert.New(t), "dst"+bbName, containerClient) // The blob must exist to have a last-modified time
 	_, err = destBlobClient.StartCopyFromURL(ctx, bbClient.URL(), &options)
-	_assert.Nil(err)
+	require.Nil(t, err)
 
 	_, err = destBlobClient.GetProperties(ctx, nil)
-	_assert.Nil(err)
+	require.Nil(t, err)
 }
 
 func (s *azblobTestSuite) TestBlobStartCopyDestIfModifiedSinceFalse() {
