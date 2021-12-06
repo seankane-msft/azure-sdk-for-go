@@ -1,0 +1,134 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobdeleteifunmodifiedsincetrue?restype=container",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/gocblobdeleteifunmodifiedsincetrue?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "0",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 201,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "ETag": "\u00220x8D9B8FF1A92EF96\u0022",
+        "Last-Modified": "Mon, 06 Dec 2021 21:26:45 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "c94e9675-001e-009e-58e7-eafbab000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobdeleteifunmodifiedsincetrue/gotestblobblobdeleteifunmodifiedsincetrue",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/gocblobdeleteifunmodifiedsincetrue/gotestblobblobdeleteifunmodifiedsincetrue",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "15",
+        "Content-Type": "application/octet-stream",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-blob-type": "BlockBlob",
+        "x-ms-date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": "R29CbG9ja0Jsb2JEYXRh",
+      "StatusCode": 201,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Content-MD5": "ebncwguMQu9sgPmr0GazhA==",
+        "Date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "ETag": "\u00220x8D9B8FF1AA30124\u0022",
+        "Last-Modified": "Mon, 06 Dec 2021 21:26:45 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-content-crc64": "\u002BJGsS7CR5kg=",
+        "x-ms-request-id": "c94e96ef-001e-009e-4ae7-eafbab000000",
+        "x-ms-request-server-encrypted": "true",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobdeleteifunmodifiedsincetrue/gotestblobblobdeleteifunmodifiedsincetrue",
+      "RequestMethod": "DELETE",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "DELETE",
+        ":path": "/gocblobdeleteifunmodifiedsincetrue/gotestblobblobdeleteifunmodifiedsincetrue",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "If-Unmodified-Since": "Mon, 06 Dec 2021 21:26:54 GMT",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 21:26:44 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-delete-type-permanent": "true",
+        "x-ms-request-id": "c94e9765-001e-009e-38e7-eafbab000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobdeleteifunmodifiedsincetrue?restype=container",
+      "RequestMethod": "DELETE",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "DELETE",
+        ":path": "/gocblobdeleteifunmodifiedsincetrue?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 21:27:36 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 21:27:36 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "c94f6835-001e-009e-79e8-eafbab000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    }
+  ],
+  "Variables": {}
+}

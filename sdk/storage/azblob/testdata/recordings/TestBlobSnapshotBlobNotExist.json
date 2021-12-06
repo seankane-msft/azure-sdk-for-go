@@ -1,0 +1,102 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobsnapshotblobnotexist?restype=container",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/gocblobsnapshotblobnotexist?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "0",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 20:20:33 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 201,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 20:20:34 GMT",
+        "ETag": "\u00220x8D9B8F5DBE6FEC4\u0022",
+        "Last-Modified": "Mon, 06 Dec 2021 20:20:34 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "b2c8eea8-701e-0084-36de-ea9a74000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobsnapshotblobnotexist/gotestblobblobsnapshotblobnotexist?comp=snapshot",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/gocblobsnapshotblobnotexist/gotestblobblobsnapshotblobnotexist?comp=snapshot",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "0",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 20:20:33 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 404,
+      "ResponseHeaders": {
+        "Content-Length": "215",
+        "Content-Type": "application/xml",
+        "Date": "Mon, 06 Dec 2021 20:20:34 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-error-code": "BlobNotFound",
+        "x-ms-request-id": "b2c8ef0b-701e-0084-12de-ea9a74000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": [
+        "\uFEFF\u003C?xml version=\u00221.0\u0022 encoding=\u0022utf-8\u0022?\u003E\u003CError\u003E\u003CCode\u003EBlobNotFound\u003C/Code\u003E\u003CMessage\u003EThe specified blob does not exist.\n",
+        "RequestId:b2c8ef0b-701e-0084-12de-ea9a74000000\n",
+        "Time:2021-12-06T20:20:34.6372434Z\u003C/Message\u003E\u003C/Error\u003E"
+      ]
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobsnapshotblobnotexist?restype=container",
+      "RequestMethod": "DELETE",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "DELETE",
+        ":path": "/gocblobsnapshotblobnotexist?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 20:20:34 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 20:20:34 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "b2c8ef80-701e-0084-7dde-ea9a74000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    }
+  ],
+  "Variables": {}
+}

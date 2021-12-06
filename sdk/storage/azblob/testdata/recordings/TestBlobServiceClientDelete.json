@@ -1,0 +1,67 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/?comp=properties\u0026restype=service",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/?comp=properties\u0026restype=service",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "137",
+        "Content-Type": "application/xml",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 22:43:27 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": "\u003CStorageServiceProperties\u003E\u003CDeleteRetentionPolicy\u003E\u003CEnabled\u003Etrue\u003C/Enabled\u003E\u003CDays\u003E1\u003C/Days\u003E\u003C/DeleteRetentionPolicy\u003E\u003C/StorageServiceProperties\u003E",
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 22:43:28 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "dfad3919-401e-006b-08f2-ea6f81000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/?comp=properties\u0026restype=service",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/?comp=properties\u0026restype=service",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "124",
+        "Content-Type": "application/xml",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 22:43:28 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": "\u003CStorageServiceProperties\u003E\u003CDeleteRetentionPolicy\u003E\u003CEnabled\u003Efalse\u003C/Enabled\u003E\u003C/DeleteRetentionPolicy\u003E\u003C/StorageServiceProperties\u003E",
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 22:43:28 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "dfad3c83-401e-006b-36f2-ea6f81000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    }
+  ],
+  "Variables": {}
+}

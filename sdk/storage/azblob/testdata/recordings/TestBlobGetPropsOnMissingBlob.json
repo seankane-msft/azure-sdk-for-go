@@ -1,0 +1,66 @@
+{
+  "Entries": [
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobgetpropsonmissingblob?restype=container",
+      "RequestMethod": "PUT",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "PUT",
+        ":path": "/gocblobgetpropsonmissingblob?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "Content-Length": "0",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 21:54:24 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 201,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 21:54:24 GMT",
+        "ETag": "\u00220x8D9B902F7DFEF8B\u0022",
+        "Last-Modified": "Mon, 06 Dec 2021 21:54:24 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "527013b9-601e-0088-5deb-ea0d7c000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    },
+    {
+      "RequestUri": "https://primfakeaccount.blob.core.windows.net/gocblobgetpropsonmissingblob?restype=container",
+      "RequestMethod": "DELETE",
+      "RequestHeaders": {
+        ":authority": "localhost:5001",
+        ":method": "DELETE",
+        ":path": "/gocblobgetpropsonmissingblob?restype=container",
+        ":scheme": "https",
+        "Accept": "application/xml",
+        "Accept-Encoding": "gzip",
+        "Authorization": "Sanitized",
+        "User-Agent": "azsdk-go-azblob/v0.2.1 azsdk-go-azcore/v0.20.0 (go1.17; Windows_NT)",
+        "x-ms-date": "Mon, 06 Dec 2021 21:55:15 GMT",
+        "x-ms-version": "2019-12-12"
+      },
+      "RequestBody": null,
+      "StatusCode": 202,
+      "ResponseHeaders": {
+        "Content-Length": "0",
+        "Date": "Mon, 06 Dec 2021 21:55:16 GMT",
+        "Server": [
+          "Windows-Azure-Blob/1.0",
+          "Microsoft-HTTPAPI/2.0"
+        ],
+        "x-ms-request-id": "5270aa5b-601e-0088-70eb-ea0d7c000000",
+        "x-ms-version": "2019-12-12"
+      },
+      "ResponseBody": null
+    }
+  ],
+  "Variables": {}
+}
