@@ -372,7 +372,6 @@ func TestBlobStartCopySourcePrivate(t *testing.T) {
 	validateStorageError(assert.New(t), err, StorageErrorCodeCannotVerifyCopySource)
 }
 
-//nolint
 func TestBlobStartCopyUsingSASSrc(t *testing.T) {
 	t.Skip("SASURL hasn't been covered yet")
 	stop := start(t)
@@ -448,7 +447,6 @@ func TestBlobStartCopyUsingSASSrc(t *testing.T) {
 	_ = resp2.Body(RetryReaderOptions{}).Close()
 }
 
-//nolint
 func TestBlobStartCopyUsingSASDest(t *testing.T) {
 	stop := start(t)
 	defer stop()
@@ -986,7 +984,6 @@ func TestBlobStartCopyDestIfNoneMatchFalse(t *testing.T) {
 	validateStorageError(assert.New(t), err, StorageErrorCodeTargetConditionNotMet)
 }
 
-//nolint
 func TestBlobAbortCopyInProgress(t *testing.T) {
 	t.Skip("Error: 'System.InvalidCastException: Unable to cast object of type 'System.Net.Http.EmptyReadStream' to type 'System.IO.MemoryStream'.'")
 	stop := start(t)
@@ -1931,7 +1928,7 @@ func TestBlobDeleteSnapshot(t *testing.T) {
 	_, err = snapshotURL.Delete(ctx, nil)
 	require.NoError(t, err)
 
-	validateBlobDeleted(assert.New(t), snapshotURL.BlobClient)
+	validateBlobDeleted(t, snapshotURL.BlobClient)
 }
 
 //
@@ -2004,13 +2001,13 @@ func TestBlobDeleteSnapshotsNoneWithSnapshots(t *testing.T) {
 	require.NotNil(t, err)
 }
 
-func validateBlobDeleted(_assert *assert.Assertions, bbClient BlobClient) {
+func validateBlobDeleted(t *testing.T, bbClient BlobClient) {
 	_, err := bbClient.GetProperties(ctx, nil)
-	_assert.NotNil(err)
+	require.NotNil(t, err)
 
 	var storageError *StorageError
-	_assert.Equal(errors.As(err, &storageError), true)
-	_assert.Equal(storageError.ErrorCode, StorageErrorCodeBlobNotFound)
+	require.Equal(t, errors.As(err, &storageError), true)
+	require.Equal(t, storageError.ErrorCode, StorageErrorCodeBlobNotFound)
 }
 
 func TestBlobDeleteIfModifiedSinceTrue(t *testing.T) {
@@ -2042,7 +2039,7 @@ func TestBlobDeleteIfModifiedSinceTrue(t *testing.T) {
 	_, err = bbClient.Delete(ctx, &deleteBlobOptions)
 	require.NoError(t, err)
 
-	validateBlobDeleted(assert.New(t), bbClient.BlobClient)
+	validateBlobDeleted(t, bbClient.BlobClient)
 }
 
 func TestBlobDeleteIfModifiedSinceFalse(t *testing.T) {
@@ -2103,7 +2100,7 @@ func TestBlobDeleteIfUnmodifiedSinceTrue(t *testing.T) {
 	_, err = bbClient.Delete(ctx, &deleteBlobOptions)
 	require.NoError(t, err)
 
-	validateBlobDeleted(assert.New(t), bbClient.BlobClient)
+	validateBlobDeleted(t, bbClient.BlobClient)
 }
 
 func TestBlobDeleteIfUnmodifiedSinceFalse(t *testing.T) {
@@ -2160,7 +2157,7 @@ func TestBlobDeleteIfMatchTrue(t *testing.T) {
 	_, err = bbClient.Delete(ctx, &deleteBlobOptions)
 	require.NoError(t, err)
 
-	validateBlobDeleted(assert.New(t), bbClient.BlobClient)
+	validateBlobDeleted(t, bbClient.BlobClient)
 }
 
 func TestBlobDeleteIfMatchFalse(t *testing.T) {
@@ -2222,7 +2219,7 @@ func TestBlobDeleteIfNoneMatchTrue(t *testing.T) {
 	_, err = bbClient.Delete(ctx, &deleteBlobOptions)
 	require.NoError(t, err)
 
-	validateBlobDeleted(assert.New(t), bbClient.BlobClient)
+	validateBlobDeleted(t, bbClient.BlobClient)
 }
 
 func TestBlobDeleteIfNoneMatchFalse(t *testing.T) {
@@ -3087,7 +3084,6 @@ func TestBlobSetMetadataIfNoneMatchFalse(t *testing.T) {
 	validateStorageError(assert.New(t), err, StorageErrorCodeConditionNotMet)
 }
 
-//nolint
 func testBlobServiceClientDeleteImpl(_ *assert.Assertions, _ ServiceClient) error {
 	//containerClient := createNewContainer(assert.New(s.T()), "gocblobserviceclientdeleteimpl", svcClient)
 	//defer deleteContainer(assert.New(s.T()), containerClient)
@@ -3310,7 +3306,6 @@ func TestBlobClientPartsSASQueryTimes(t *testing.T) {
 	}
 }
 
-//nolint
 func TestDownloadBlockBlobUnexpectedEOF(t *testing.T) {
 	t.Skip("Error: 'System.InvalidCastException: Unable to cast object of type 'System.Net.Http.EmptyReadStream' to type 'System.IO.MemoryStream'.'")
 	stop := start(t)
@@ -3344,7 +3339,6 @@ func TestDownloadBlockBlobUnexpectedEOF(t *testing.T) {
 	require.EqualValues(t, buf, []byte(blockBlobDefaultData))
 }
 
-//nolint
 func InjectErrorInRetryReaderOptions(err error) RetryReaderOptions {
 	return RetryReaderOptions{
 		MaxRetryRequests:       1,
