@@ -15,13 +15,18 @@ import (
 func TestMain(m *testing.M) {
 	// 1. Set up session level sanitizers
 	if recording.GetRecordMode() == "record" {
+		err := recording.ResetProxy(nil)
+		if err != nil {
+			panic(err)
+		}
+
 		account, ok := os.LookupEnv(AccountNameEnvVar)
 		if !ok {
 			fmt.Printf("Could not find environment variable: %s", AccountNameEnvVar)
 			os.Exit(1)
 		}
 
-		err := recording.AddURISanitizer("fakeaccount", account, nil)
+		err = recording.AddURISanitizer("fakeaccount", account, nil)
 		if err != nil {
 			panic(err)
 		}
