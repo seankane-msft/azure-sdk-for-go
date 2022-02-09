@@ -5,6 +5,10 @@
 ### Features Added
 
 ### Breaking Changes
+* Renamed `KeyBundle` to `KeyVaultKey`
+* Renamed `DeletedKeyBundle` to `DeletedKey`
+* Removed `JSONWeb` prefix from `JSONWebKeyOperation` and `JSONWebKeyCurveName`
+* Renamed `KeyEncryptionAlgorithm` to `KeyExportEncryptionAlgorithm`
 
 ### Bugs Fixed
 
