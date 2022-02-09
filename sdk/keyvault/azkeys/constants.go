@@ -133,16 +133,16 @@ func (c ActionType) ToPtr() *ActionType {
 	return &c
 }
 
-// KeyEncryptionAlgorithm - The encryption algorithm to use to protected the exported key material
-type KeyEncryptionAlgorithm string
+// KeyExportEncryptionAlgorithm - The encryption algorithm to use to protected the exported key material
+type KeyExportEncryptionAlgorithm string
 
 const (
-	KeyEncryptionAlgorithmCKMRSAAESKEYWRAP KeyEncryptionAlgorithm = "CKM_RSA_AES_KEY_WRAP"
-	KeyEncryptionAlgorithmRSAAESKEYWRAP256 KeyEncryptionAlgorithm = "RSA_AES_KEY_WRAP_256"
-	KeyEncryptionAlgorithmRSAAESKEYWRAP384 KeyEncryptionAlgorithm = "RSA_AES_KEY_WRAP_384"
+	KeyExportEncryptionAlgorithmCKMRSAAESKEYWRAP KeyExportEncryptionAlgorithm = "CKM_RSA_AES_KEY_WRAP"
+	KeyExportEncryptionAlgorithmRSAAESKEYWRAP256 KeyExportEncryptionAlgorithm = "RSA_AES_KEY_WRAP_256"
+	KeyExportEncryptionAlgorithmRSAAESKEYWRAP384 KeyExportEncryptionAlgorithm = "RSA_AES_KEY_WRAP_384"
 )
 
-// ToPtr returns a *KeyEncryptionAlgorithm pointing to the current value.
-func (c KeyEncryptionAlgorithm) ToPtr() *KeyEncryptionAlgorithm {
+// ToPtr returns a *KeyExportEncryptionAlgorithm pointing to the current value.
+func (c KeyExportEncryptionAlgorithm) ToPtr() *KeyExportEncryptionAlgorithm {
 	return &c
 }

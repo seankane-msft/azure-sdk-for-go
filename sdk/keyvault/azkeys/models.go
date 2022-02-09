@@ -94,8 +94,8 @@ func keyAttributesFromGenerated(i *generated.KeyAttributes) *KeyAttributes {
 	}
 }
 
-// KeyBundle - A KeyBundle consisting of a WebKey plus its attributes.
-type KeyBundle struct {
+// KeyVaultKey - A KeyVaultKey consisting of a WebKey plus its attributes.
+type KeyVaultKey struct {
 	// The key management attributes.
 	Attributes *KeyAttributes `json:"attributes,omitempty"`
 
@@ -266,9 +266,9 @@ func keyItemFromGenerated(i *generated.KeyItem) *KeyItem {
 	}
 }
 
-// DeletedKeyBundle - A DeletedKeyBundle consisting of a WebKey plus its Attributes and deletion info
-type DeletedKeyBundle struct {
-	KeyBundle
+// DeletedKey - A DeletedKey consisting of a WebKey plus its Attributes and deletion info
+type DeletedKey struct {
+	KeyVaultKey
 	// The url of the recovery object, used to identify and recover the deleted key.
 	RecoveryID *string `json:"recoveryId,omitempty"`
 
