@@ -4,6 +4,7 @@
 package aztables
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -55,19 +56,21 @@ type TransactionAction struct {
 	IfMatch    *azcore.ETag
 }
 
+// TransactionResponse contains response fields for Client.TransactionResponse
 type TransactionResponse struct {
-	// The response for a single table.
-	// TransactionResponses []http.Response
-	RawResponse *http.Response
+	// placeholder for future response fields
 }
 
+// SubmitTransactionOptions contains optional parameters for Client.SubmitTransaction
 type SubmitTransactionOptions struct {
-	RequestID *string
+	// placeholder for future optional parameters
 }
 
-// SubmitTransaction submits the table transactional batch according to the slice of TransactionActions provided. All transactionActions must be for entities
-// with the same PartitionKey. There can only be one transaction action for a row key, a duplicated row key will return an error. The TransactionResponse object
-// contains the response for each sub-request in the same order that they are made in the transactionActions parameter.
+// SubmitTransaction submits the table transactional batch according to the slice of TransactionActions provided.
+// All transactionActions must be for entities with the same PartitionKey. There can only be one transaction action
+// for a RowKey, a duplicated row key will return an error. A storage account will return a 202 Accepted response
+// when a transaction fails, the multipart data will have 4XX responses for the batch request that failed. For
+// more information about error responses see https://docs.microsoft.com/en-us/rest/api/storageservices/performing-entity-group-transactions#sample-error-response
 func (t *Client) SubmitTransaction(ctx context.Context, transactionActions []TransactionAction, tableSubmitTransactionOptions *SubmitTransactionOptions) (TransactionResponse, error) {
 	u1, err := uuid.New()
 	if err != nil {
@@ -95,9 +98,6 @@ func (t *Client) submitTransactionInternal(ctx context.Context, transactionActio
 		return TransactionResponse{}, err
 	}
 	req.Raw().Header.Set("x-ms-version", "2019-02-02")
-	if tableSubmitTransactionOptions != nil && tableSubmitTransactionOptions.RequestID != nil {
-		req.Raw().Header.Set("x-ms-client-request-id", *tableSubmitTransactionOptions.RequestID)
-	}
 	req.Raw().Header.Set("DataServiceVersion", "3.0")
 	req.Raw().Header.Set("Accept", string(generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata))
 
@@ -126,6 +126,9 @@ func (t *Client) submitTransactionInternal(ctx context.Context, transactionActio
 	}
 
 	reqBody, err := ioutil.ReadAll(req.Raw().Body)
+	if err != nil {
+		return TransactionResponse{}, err
+	}
 	fmt.Println("REQ BODY: \n", string(reqBody))
 
 	resp, err := t.con.Pipeline().Do(req)
@@ -133,48 +136,35 @@ func (t *Client) submitTransactionInternal(ctx context.Context, transactionActio
 		return TransactionResponse{}, err
 	}
 
-	return TransactionResponse{
-		RawResponse: resp,
-	}, nil
-	/*
-		transactionResponse, err := buildTransactionResponse(req, resp, len(transactionActions))
-		if err != nil {
-			return *transactionResponse, err
-		}
+	if !runtime.HasStatusCode(resp, http.StatusAccepted, http.StatusNoContent) {
+		return TransactionResponse{}, runtime.NewResponseError(resp)
+	}
 
-		if !runtime.HasStatusCode(resp, http.StatusAccepted, http.StatusNoContent) {
-			return TransactionResponse{}, runtime.NewResponseError(resp)
-		}
-		return *transactionResponse, nil
-	*/
+	return buildTransactionResponse(req, resp, len(transactionActions))
 }
 
-/*
 // create the transaction response. This will read the inner responses
-func buildTransactionResponse(req *policy.Request, resp *http.Response, itemCount int) (*TransactionResponse, error) {
-	innerResponses := make([]http.Response, itemCount)
-	result := TransactionResponse{} //TransactionResponses: innerResponses}
-
+func buildTransactionResponse(req *policy.Request, resp *http.Response, itemCount int) (TransactionResponse, error) {
 	bytesBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &TransactionResponse{}, err
+		return TransactionResponse{}, err
 	}
 	reader := bytes.NewReader(bytesBody)
 	if bytes.IndexByte(bytesBody, '{') == 0 {
 		// This is a failure and the body is json
-		return &TransactionResponse{}, runtime.NewResponseError(resp)
+		return TransactionResponse{}, runtime.NewResponseError(resp)
 	}
 
 	outerBoundary := getBoundaryName(bytesBody)
 	mpReader := multipart.NewReader(reader, outerBoundary)
 	outerPart, err := mpReader.NextPart()
 	if err != nil {
-		return &TransactionResponse{}, err
+		return TransactionResponse{}, err
 	}
 
 	innerBytes, err := ioutil.ReadAll(outerPart)
 	if err != nil && err != io.ErrUnexpectedEOF { // Cosmos specific error handling
-		return &TransactionResponse{}, err
+		return TransactionResponse{}, err
 	}
 	innerBoundary := getBoundaryName(innerBytes)
 	reader = bytes.NewReader(innerBytes)
@@ -188,20 +178,15 @@ func buildTransactionResponse(req *policy.Request, resp *http.Response, itemCoun
 		}
 		r, err := http.ReadResponse(bufio.NewReader(bytes.NewBuffer(part)), req.Raw())
 		if err != nil {
-			return &TransactionResponse{}, err
+			return TransactionResponse{}, runtime.NewResponseError(resp)
 		}
 		if r.StatusCode >= 400 {
-			if err != nil {
-				return &TransactionResponse{}, err
-			} else {
-				return &result, runtime.NewResponseError(resp)
-			}
+			return TransactionResponse{}, runtime.NewResponseError(resp)
 		}
-		innerResponses[i] = *r
 		i++
 	}
 
-	return &result, nil
+	return TransactionResponse{}, nil
 }
 
 func getBoundaryName(bytesBody []byte) string {
@@ -211,7 +196,7 @@ func getBoundaryName(bytesBody []byte) string {
 	}
 	return string(bytesBody[2:end])
 }
-*/
+
 // generateChangesetBody generates the individual changesets for the various operations within the batch request.
 // There is a changeset for Insert, Delete, Merge etc.
 func (t *Client) generateChangesetBody(changesetBoundary string, transactionActions []TransactionAction) (*bytes.Buffer, error) {
@@ -222,8 +207,8 @@ func (t *Client) generateChangesetBody(changesetBoundary string, transactionActi
 		return nil, err
 	}
 
-	for _, be := range transactionActions {
-		err := t.generateEntitySubset(&be, writer)
+	for idx, be := range transactionActions {
+		err := t.generateEntitySubset(&be, writer, idx)
 		if err != nil {
 			return nil, err
 		}
@@ -234,10 +219,11 @@ func (t *Client) generateChangesetBody(changesetBoundary string, transactionActi
 }
 
 // generateEntitySubset generates body payload for particular batch entity
-func (t *Client) generateEntitySubset(transactionAction *TransactionAction, writer *multipart.Writer) error {
+func (t *Client) generateEntitySubset(transactionAction *TransactionAction, writer *multipart.Writer, contentID int) error {
 	h := make(textproto.MIMEHeader)
 	h.Set(headerContentType, "application/http")
 	h.Set(headerContentTransferEncoding, "binary")
+	h.Set("Content-ID", fmt.Sprint(contentID))
 	qo := &generated.QueryOptions{Format: generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata.ToPtr()}
 
 	operationWriter, err := writer.CreatePart(h)

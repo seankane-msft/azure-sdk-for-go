@@ -146,16 +146,6 @@ func ExampleClient_SubmitTransaction() {
 		} else {
 			panic(err)
 		}
-	} else {
-		// for _, subResp := range resp.TransactionResponses {
-		// 	if subResp.StatusCode != http.StatusAccepted {
-		// 		body, err := ioutil.ReadAll(subResp.Body)
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		fmt.Println(string(body))
-		// 	}
-		// }
 	}
 }
 
