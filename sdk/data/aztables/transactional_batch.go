@@ -4,7 +4,6 @@
 package aztables
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -15,6 +14,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"sort"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
@@ -57,7 +57,8 @@ type TransactionAction struct {
 
 type TransactionResponse struct {
 	// The response for a single table.
-	TransactionResponses []http.Response
+	// TransactionResponses []http.Response
+	RawResponse *http.Response
 }
 
 type SubmitTransactionOptions struct {
@@ -76,12 +77,12 @@ func (t *Client) SubmitTransaction(ctx context.Context, transactionActions []Tra
 	if err != nil {
 		return TransactionResponse{}, err
 	}
-	return t.submitTransactionInternal(ctx, &transactionActions, u1, u2, tableSubmitTransactionOptions)
+	return t.submitTransactionInternal(ctx, transactionActions, u1, u2, tableSubmitTransactionOptions)
 }
 
 // submitTransactionInternal is the internal implementation for SubmitTransaction. It allows for explicit configuration of the batch and changeset UUID values for testing.
-func (t *Client) submitTransactionInternal(ctx context.Context, transactionActions *[]TransactionAction, batchUuid uuid.UUID, changesetUuid uuid.UUID, tableSubmitTransactionOptions *SubmitTransactionOptions) (TransactionResponse, error) {
-	if len(*transactionActions) == 0 {
+func (t *Client) submitTransactionInternal(ctx context.Context, transactionActions []TransactionAction, batchUuid uuid.UUID, changesetUuid uuid.UUID, tableSubmitTransactionOptions *SubmitTransactionOptions) (TransactionResponse, error) {
+	if len(transactionActions) == 0 {
 		return TransactionResponse{}, errEmptyTransaction
 	}
 	changesetBoundary := fmt.Sprintf("changeset_%s", changesetUuid.String())
@@ -124,26 +125,35 @@ func (t *Client) submitTransactionInternal(ctx context.Context, transactionActio
 		return TransactionResponse{}, err
 	}
 
+	reqBody, err := ioutil.ReadAll(req.Raw().Body)
+	fmt.Println("REQ BODY: \n", string(reqBody))
+
 	resp, err := t.con.Pipeline().Do(req)
 	if err != nil {
 		return TransactionResponse{}, err
 	}
 
-	transactionResponse, err := buildTransactionResponse(req, resp, len(*transactionActions))
-	if err != nil {
-		return *transactionResponse, err
-	}
+	return TransactionResponse{
+		RawResponse: resp,
+	}, nil
+	/*
+		transactionResponse, err := buildTransactionResponse(req, resp, len(transactionActions))
+		if err != nil {
+			return *transactionResponse, err
+		}
 
-	if !runtime.HasStatusCode(resp, http.StatusAccepted, http.StatusNoContent) {
-		return TransactionResponse{}, runtime.NewResponseError(resp)
-	}
-	return *transactionResponse, nil
+		if !runtime.HasStatusCode(resp, http.StatusAccepted, http.StatusNoContent) {
+			return TransactionResponse{}, runtime.NewResponseError(resp)
+		}
+		return *transactionResponse, nil
+	*/
 }
 
+/*
 // create the transaction response. This will read the inner responses
 func buildTransactionResponse(req *policy.Request, resp *http.Response, itemCount int) (*TransactionResponse, error) {
 	innerResponses := make([]http.Response, itemCount)
-	result := TransactionResponse{TransactionResponses: innerResponses}
+	result := TransactionResponse{} //TransactionResponses: innerResponses}
 
 	bytesBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -201,11 +211,10 @@ func getBoundaryName(bytesBody []byte) string {
 	}
 	return string(bytesBody[2:end])
 }
-
+*/
 // generateChangesetBody generates the individual changesets for the various operations within the batch request.
 // There is a changeset for Insert, Delete, Merge etc.
-func (t *Client) generateChangesetBody(changesetBoundary string, transactionActions *[]TransactionAction) (*bytes.Buffer, error) {
-
+func (t *Client) generateChangesetBody(changesetBoundary string, transactionActions []TransactionAction) (*bytes.Buffer, error) {
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 	err := writer.SetBoundary(changesetBoundary)
@@ -213,7 +222,7 @@ func (t *Client) generateChangesetBody(changesetBoundary string, transactionActi
 		return nil, err
 	}
 
-	for _, be := range *transactionActions {
+	for _, be := range transactionActions {
 		err := t.generateEntitySubset(&be, writer)
 		if err != nil {
 			return nil, err
@@ -227,8 +236,8 @@ func (t *Client) generateChangesetBody(changesetBoundary string, transactionActi
 // generateEntitySubset generates body payload for particular batch entity
 func (t *Client) generateEntitySubset(transactionAction *TransactionAction, writer *multipart.Writer) error {
 	h := make(textproto.MIMEHeader)
-	h.Set(headerContentTransferEncoding, "binary")
 	h.Set(headerContentType, "application/http")
+	h.Set(headerContentTransferEncoding, "binary")
 	qo := &generated.QueryOptions{Format: generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata.ToPtr()}
 
 	operationWriter, err := writer.CreatePart(h)
@@ -265,6 +274,7 @@ func (t *Client) generateEntitySubset(transactionAction *TransactionAction, writ
 			&generated.TableClientDeleteEntityOptions{},
 			qo,
 		)
+		req.Raw().Header.Set("Content-Type", "application/json;odata=nometadata")
 		if err != nil {
 			return err
 		}
@@ -277,8 +287,11 @@ func (t *Client) generateEntitySubset(transactionAction *TransactionAction, writ
 				TableEntityProperties: entity,
 				ResponsePreference:    generated.ResponseFormatReturnNoContent.ToPtr(),
 			},
-			qo,
+			&generated.QueryOptions{},
 		)
+		req.Raw().Header.Set("Content-Type", "application/json;odata=nometadata")
+		req.Raw().Header.Set(headerXmsDate, time.Now().UTC().Format(http.TimeFormat))
+		req.Raw().Header.Set("Date", time.Now().UTC().Format(http.TimeFormat))
 		if err != nil {
 			return err
 		}

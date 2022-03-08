@@ -21,7 +21,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -443,6 +442,7 @@ var modeMap = map[RecordMode]recorder.Mode{
 	Playback: recorder.ModeReplaying,
 }
 
+/*
 func init() {
 	recordMode = os.Getenv("AZURE_RECORD_MODE")
 	if recordMode == "" {
@@ -493,7 +493,7 @@ func init() {
 		log.Println("default matcher was set ")
 	}
 }
-
+*/
 var recordMode string
 var rootCAs *x509.CertPool
 
