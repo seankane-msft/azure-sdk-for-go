@@ -155,7 +155,7 @@ func (l *ListEntitiesOptions) toQueryOptions() *generated.QueryOptions {
 
 	return &generated.QueryOptions{
 		Filter: l.Filter,
-		Format: generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata.ToPtr(),
+		Format: to.Ptr(generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata),
 		Select: l.Select,
 		Top:    l.Top,
 	}
@@ -275,7 +275,8 @@ type GetEntityOptions struct {
 }
 
 func (g *GetEntityOptions) toGenerated() (*generated.TableClientQueryEntityWithPartitionAndRowKeyOptions, *generated.QueryOptions) {
-	return &generated.TableClientQueryEntityWithPartitionAndRowKeyOptions{}, &generated.QueryOptions{Format: generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata.ToPtr()}
+	return &generated.TableClientQueryEntityWithPartitionAndRowKeyOptions{}, &generated.QueryOptions{
+		Format: to.Ptr(generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata)}
 }
 
 // GetEntityResponse contains response fields for Client.GetEntity
@@ -355,7 +356,8 @@ func (t *Client) AddEntity(ctx context.Context, entity []byte, options *AddEntit
 	if err != nil {
 		return AddEntityResponse{}, err
 	}
-	resp, err := t.client.InsertEntity(ctx, generated.Enum1Three0, t.name, &generated.TableClientInsertEntityOptions{TableEntityProperties: mapEntity, ResponsePreference: generated.ResponseFormatReturnNoContent.ToPtr()}, nil)
+	resp, err := t.client.InsertEntity(ctx, generated.Enum1Three0, t.name, &generated.TableClientInsertEntityOptions{
+		TableEntityProperties: mapEntity, ResponsePreference: to.Ptr(generated.ResponseFormatReturnNoContent)}, nil)
 	if err != nil {
 		err = checkEntityForPkRk(&mapEntity, err)
 		return AddEntityResponse{}, err
@@ -406,7 +408,7 @@ func (u *UpdateEntityOptions) toGeneratedMergeEntity(m map[string]interface{}) *
 		return &generated.TableClientMergeEntityOptions{}
 	}
 	return &generated.TableClientMergeEntityOptions{
-		IfMatch:               to.StringPtr(string(*u.IfMatch)),
+		IfMatch:               to.Ptr(string(*u.IfMatch)),
 		TableEntityProperties: m,
 	}
 }
@@ -416,7 +418,7 @@ func (u *UpdateEntityOptions) toGeneratedUpdateEntity(m map[string]interface{}) 
 		return &generated.TableClientUpdateEntityOptions{}
 	}
 	return &generated.TableClientUpdateEntityOptions{
-		IfMatch:               to.StringPtr(string(*u.IfMatch)),
+		IfMatch:               to.Ptr(string(*u.IfMatch)),
 		TableEntityProperties: m,
 	}
 }

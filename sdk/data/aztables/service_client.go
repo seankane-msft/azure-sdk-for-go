@@ -14,6 +14,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	generated "github.com/Azure/azure-sdk-for-go/sdk/data/aztables/internal"
 )
 
@@ -152,7 +153,7 @@ func (l *ListTablesOptions) toQueryOptions() *generated.QueryOptions {
 
 	return &generated.QueryOptions{
 		Filter: l.Filter,
-		Format: generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata.ToPtr(),
+		Format: to.Ptr(generated.ODataMetadataFormatApplicationJSONODataMinimalmetadata),
 		Select: l.Select,
 		Top:    l.Top,
 	}

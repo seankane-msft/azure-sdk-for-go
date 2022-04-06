@@ -5,6 +5,7 @@
 ### Features Added
 
 ### Breaking Changes
+* Requires go 1.18
 
 ### Bugs Fixed
 
