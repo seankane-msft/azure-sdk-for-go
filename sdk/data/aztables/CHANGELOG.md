@@ -1,15 +1,9 @@
 # Release History
 
-## 0.6.1 (Unreleased)
-
-### Features Added
+## 0.7.0 (Unreleased)
 
 ### Breaking Changes
 * Requires go 1.18
-
-### Bugs Fixed
-
-### Other Changes
 
 ## 0.6.0 (2022-03-08)
 
